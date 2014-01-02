@@ -4,16 +4,20 @@
 #
 
 node[:deploy].each do |application, deploy|
-  template "#{node[:monit][:conf_dir]}/sidekiq_#{application}.monitrc" do
+  process_name = "sidekiq_#{application}"
+
+  template "/etc/monit.d/#{process_name}.monitrc" do
+    source "monitrc.conf.erb"
     owner 'root'
     group 'root'
     mode 0644
-    source "monitrc.conf.erb"
-    variables({
-      :worker_count => node[:sidekiq][:worker_count],
-      :app_name => application,
-      :deploy => deploy
-    })
+    variables(
+      :env => deploy[:rails_env],
+      :path => deploy[:deploy_to],
+      :user => deploy[:user],
+      :group => deploy[:group],
+      :process_name => process_name
+    )
   end
 
   execute "ensure-sidekiq-is-setup-with-monit" do
@@ -24,7 +28,7 @@ node[:deploy].each do |application, deploy|
 
   execute "restart-sidekiq" do
     command %Q{
-      echo "sleep 20 && monit -g sidekiq_#{application} restart all" | at now
+      echo "sleep 20 && monit -g #{process_name} restart all" | at now
     }
   end
 end
