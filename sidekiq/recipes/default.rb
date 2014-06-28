@@ -22,13 +22,13 @@ node[:deploy].each do |application, deploy|
 
   execute "ensure-sidekiq-is-setup-with-monit" do
     command %Q{
-      monit reload
+      monit -vv reload
     }
   end
 
   execute "restart-sidekiq" do
     command %Q{
-      echo "sleep 20 && monit -g #{process_name} restart all" | at now
+      echo "sleep 20 && monit -vv -g #{process_name} restart all" | at now
     }
   end
 end
