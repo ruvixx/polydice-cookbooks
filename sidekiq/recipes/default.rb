@@ -16,7 +16,8 @@ node[:deploy].each do |application, deploy|
       :path => deploy[:deploy_to],
       :user => deploy[:user],
       :group => deploy[:group],
-      :process_name => process_name
+      :process_name => process_name,
+      :custom_env => node[:custom_env][application]
     )
   end
 
