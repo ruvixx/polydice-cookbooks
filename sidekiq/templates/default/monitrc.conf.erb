@@ -1,5 +1,6 @@
 check process <%= @process_name %>
   with pidfile <%= @path %>/shared/pids/<%= @process_name %>.pid
-  start program = "/bin/bash -c 'cd <%= @path %>/current; PATH=/usr/local/bin:$PATH bundle exec sidekiq -c 4 -e <%= @env %> -d -P <%= @path %>/shared/pids/<%= @process_name %>.pid -L log/sidekiq.log'" as uid <%= @user %> and gid <%= @group %> with timeout 90 seconds
-  stop program = "/bin/bash -c '/bin/kill -TERM `cat <%= @path %>/shared/pids/<%= @process_name %>.pid`'" with timeout 180 seconds
+  start program = "/bin/bash -c 'cd <%= @path %>/current; PATH=/usr/local/bin:$PATH bundle exec sidekiq -v -c 4 -e <%= @env %> -d -P <%= @path %>/shared/pids/<%= @process_name %>.pid -L log/sidekiq.log'" as uid <%= @user %> and gid <%= @group %> with timeout 90 seconds
+  stop program = "/bin/bash -c 'cd <%= @path %>/current; PATH=/usr/local/bin:$PATH bundle exec sidekiqctl stop <%= @path %>/shared/pids/<%= @process_name %>.pid 30'" with timeout 180 seconds
+  if totalmem is greater than 768 MB for 10 cycles then restart
   group <%= @process_name %>
