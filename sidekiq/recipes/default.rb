@@ -11,14 +11,20 @@ node[:deploy].each do |application, deploy|
     owner 'root'
     group 'root'
     mode 0644
-    variables(
+
+    vars = {
       :env => deploy[:rails_env],
       :path => deploy[:deploy_to],
       :user => deploy[:user],
       :group => deploy[:group],
       :process_name => process_name,
-      :custom_env => node[:custom_env][application]
-    )
+      :custom_env => node[:custom_env][application],
+    }
+    if (node[:sidekiq] && node[:sidekiq][application])
+      vars[:sidekiq] = node[:sidekiq][application]
+    end
+
+    variables vars
   end
 
   execute "ensure-sidekiq-is-setup-with-monit" do
