@@ -4,3 +4,8 @@ check process <%= @process_name %>
   stop program = "/bin/bash -c 'cd <%= @path %>/current; PATH=/usr/local/bin:$PATH bundle exec sidekiqctl stop <%= @path %>/shared/pids/<%= @process_name %>.pid 30'" with timeout 180 seconds
   if totalmem is greater than <%= @sidekiq && @sidekiq[:totalmem] || '2.5 GB' %> for 10 cycles then restart
   group <%= @process_name %>
+
+check program count_sidekiq with path /usr/local/bin/count_sidekiq.sh with timeout 5 seconds
+  if status != 0 then exec "/usr/bin/pkill -f 'sidekiq.*rvx_rds'"
+  group <%= @process_name %>
+

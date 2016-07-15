@@ -1,0 +1,7 @@
+#!/bin/bash
+sidekiq_count=$(pgrep -c -f 'sidekiq.*rvx_rds')
+if [[ $sidekiq_count -gt 1 ]]; then
+  exit 1
+else:
+  exit 0
+fi
